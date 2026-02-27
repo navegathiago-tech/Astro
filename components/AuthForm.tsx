@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Lock, Loader2, LogIn, UserPlus } from 'lucide-react';
 
 export default function AuthForm({ onAuthSuccess }: { onAuthSuccess: (email: string) => void }) {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -89,28 +88,13 @@ export default function AuthForm({ onAuthSuccess }: { onAuthSuccess: (email: str
         >
           {loading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
-          ) : isLogin ? (
+          ) : (
             <>
               <LogIn className="w-5 h-5" />
               Entrar
             </>
-          ) : (
-            <>
-              <UserPlus className="w-5 h-5" />
-              Criar Conta
-            </>
           )}
         </button>
-
-        <div className="text-center">
-          <button
-            type="button"
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-stone-400 hover:text-amber-200 text-sm transition-colors"
-          >
-            {isLogin ? 'Não tem uma conta? Cadastre-se' : 'Já tem uma conta? Entre agora'}
-          </button>
-        </div>
       </form>
     </motion.div>
   );

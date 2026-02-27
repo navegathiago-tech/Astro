@@ -28,6 +28,18 @@ export default function SoulmateReveal({
   const [error, setError] = useState('');
 
   const generateSoulmate = async () => {
+    // Check if image already exists for this user in localStorage (simulating one per user)
+    const storageKey = `soulmate_${userData.fullName.replace(/\s/g, '_')}`;
+    const savedData = localStorage.getItem(storageKey);
+    
+    if (savedData) {
+      const { url, desc } = JSON.parse(savedData);
+      setImageUrl(url);
+      setDescription(desc);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! });
@@ -39,7 +51,7 @@ export default function SoulmateReveal({
           Com base neste mapa astral: ${astroData.substring(0, 2000)}
           Descreva fisicamente como seria a alma gêmea ideal para esta pessoa.
           Considere que o usuário é do gênero ${userData.gender}.
-          A descrição deve ser focada em traços faciais, olhar e aura.
+          A descrição deve ser focada em traços faciais realistas, olhar profundo e aura.
           Retorne um parágrafo curto e poético.
         `,
       });
@@ -49,13 +61,13 @@ export default function SoulmateReveal({
 
       // Step 2: Generate Image
       const prompt = `
-        A realistic, artistic hand-drawn sketch portrait of a person. 
-        Black and white charcoal style. 
-        The person should look like a soulmate based on this description: ${visualDesc}.
-        Focus on a deep, soulful look in the eyes. 
-        High contrast, fine lines, professional artistic drawing.
+        A hyper-realistic, highly detailed artistic hand-drawn sketch portrait of a person. 
+        Black and white charcoal and graphite style with fine textures. 
+        The person should look like a real human soulmate based on this description: ${visualDesc}.
+        Focus on incredibly realistic eyes, skin texture within a sketch medium, and a soulful expression. 
+        Professional fine-art drawing, high contrast, cinematic lighting.
         The person should be of the opposite gender of ${userData.gender} (or compatible based on soulmate concept).
-        Vintage paper texture background.
+        Vintage high-quality paper texture background.
       `;
 
       const imageResponse = await ai.models.generateContent({
@@ -71,13 +83,17 @@ export default function SoulmateReveal({
       });
 
       let foundImage = false;
-      if (imageResponse.candidates && imageResponse.candidates[0].content.parts) {
+      if (imageResponse.candidates && imageResponse.candidates[0].content && imageResponse.candidates[0].content.parts) {
         for (const part of imageResponse.candidates[0].content.parts) {
           if (part.inlineData) {
             const base64 = part.inlineData.data;
-            setImageUrl(`data:image/png;base64,${base64}`);
+            const url = `data:image/png;base64,${base64}`;
+            setImageUrl(url);
             foundImage = true;
             
+            // Save to local storage to prevent re-generation
+            localStorage.setItem(storageKey, JSON.stringify({ url, desc: visualDesc }));
+
             confetti({
               particleCount: 150,
               spread: 70,
@@ -202,15 +218,6 @@ export default function SoulmateReveal({
               </div>
             </div>
           </motion.div>
-
-          <button
-            onClick={generateSoulmate}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 text-stone-500 hover:text-amber-200 transition-colors py-4 border border-white/5 rounded-2xl hover:bg-white/5"
-          >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-            Tentar nova revelação
-          </button>
         </div>
       </div>
     </div>
