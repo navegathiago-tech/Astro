@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import { motion, AnimatePresence } from 'motion/react';
-import { Loader2, Heart, Camera, RefreshCw, Download, Share2 } from 'lucide-react';
+import { Loader2, Heart, Camera, Download, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import confetti from 'canvas-confetti';
 
@@ -42,25 +41,28 @@ export default function SoulmateReveal({
 
     setLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! });
-      
-      // Step 1: Generate visual description based on astro data
-      const descResponse = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `
-          Com base neste mapa astral: ${astroData.substring(0, 2000)}
-          Descreva fisicamente como seria a alma gêmea ideal para esta pessoa.
-          Considere que o usuário é do gênero ${userData.gender}.
-          A descrição deve ser focada em traços faciais realistas, olhar profundo e aura.
-          Retorne um parágrafo curto e poético.
-        `,
+      // Step 1: Generate visual description via Astro Chart API (reusing text model)
+      const descPrompt = `
+        Com base neste mapa astral: ${astroData.substring(0, 2000)}
+        Descreva fisicamente como seria a alma gêmea ideal para esta pessoa.
+        Considere que o usuário é do gênero ${userData.gender}.
+        A descrição deve ser focada em traços faciais realistas, olhar profundo e aura.
+        Retorne um parágrafo curto e poético.
+      `;
+
+      const descResponse = await fetch('/api/astro-chart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: descPrompt }),
       });
+      const descData = await descResponse.json();
+      if (descData.error) throw new Error(descData.error);
       
-      const visualDesc = descResponse.text || '';
+      const visualDesc = descData.text || '';
       setDescription(visualDesc);
 
-      // Step 2: Generate Image
-      const prompt = `
+      // Step 2: Generate Image via Soulmate API (Image model)
+      const visualPrompt = `
         A hyper-realistic, highly detailed artistic hand-drawn sketch portrait of a person. 
         Black and white charcoal and graphite style with fine textures. 
         The person should look like a real human soulmate based on this description: ${visualDesc}.
@@ -70,43 +72,29 @@ export default function SoulmateReveal({
         Vintage high-quality paper texture background.
       `;
 
-      const imageResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: {
-          parts: [{ text: prompt }],
-        },
-        config: {
-          imageConfig: {
-            aspectRatio: "3:4"
-          }
-        }
+      const imageResponse = await fetch('/api/soulmate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visualPrompt }),
       });
+      const imageData = await imageResponse.json();
+      if (imageData.error) throw new Error(imageData.error);
 
-      let foundImage = false;
-      if (imageResponse.candidates && imageResponse.candidates[0].content && imageResponse.candidates[0].content.parts) {
-        for (const part of imageResponse.candidates[0].content.parts) {
-          if (part.inlineData) {
-            const base64 = part.inlineData.data;
-            const url = `data:image/png;base64,${base64}`;
-            setImageUrl(url);
-            foundImage = true;
-            
-            // Save to local storage to prevent re-generation
-            localStorage.setItem(storageKey, JSON.stringify({ url, desc: visualDesc }));
+      if (imageData.image) {
+        const url = `data:image/png;base64,${imageData.image}`;
+        setImageUrl(url);
+        
+        // Save to local storage to prevent re-generation
+        localStorage.setItem(storageKey, JSON.stringify({ url, desc: visualDesc }));
 
-            confetti({
-              particleCount: 150,
-              spread: 70,
-              origin: { y: 0.6 },
-              colors: ['#f59e0b', '#fbbf24', '#ffffff']
-            });
-            break;
-          }
-        }
-      }
-
-      if (!foundImage) {
-        throw new Error('Nenhuma imagem foi gerada pelo modelo.');
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#f59e0b', '#fbbf24', '#ffffff']
+        });
+      } else {
+        throw new Error('Nenhuma imagem foi gerada.');
       }
 
     } catch (err: any) {

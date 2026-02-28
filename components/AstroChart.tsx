@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
 import { motion } from 'motion/react';
 import { Loader2, Star, Moon, Sun, Heart, ChevronRight } from 'lucide-react';
@@ -31,7 +30,6 @@ export default function AstroChart({
   useEffect(() => {
     const generateChart = async () => {
       try {
-        const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY! });
         const prompt = `
           Você é um astrólogo mestre. Gere um mapa astral completo e detalhado para:
           Nome: ${userData.fullName}
@@ -52,12 +50,16 @@ export default function AstroChart({
           Seja poético, profundo e místico. Use emojis.
         `;
 
-        const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: prompt,
+        const response = await fetch('/api/astro-chart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt }),
         });
 
-        const text = response.text || '';
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        const text = data.text || '';
         setInterpretation(text);
         onDataGenerated(text);
 
