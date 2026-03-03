@@ -40,9 +40,10 @@ export default function Home() {
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
           <div className="max-w-md w-full space-y-8">
             <div className="text-center space-y-4">
-              <h1 className="text-6xl font-display text-amber-200 tracking-tight">AstroSoul</h1>
-              <p className="text-stone-400 font-light tracking-wide">
-                Conecte-se com o cosmos e descubra sua alma gêmea.
+              <h1 className="text-5xl font-display text-amber-200 tracking-tight leading-tight">Ramon Velasquez</h1>
+              <p className="text-amber-100/60 text-xl font-display italic">O Retrato da sua alma gêmea</p>
+              <p className="text-stone-400 font-light tracking-wide pt-4">
+                Conecte-se com o cosmos e descubra quem o destino reservou para você.
               </p>
             </div>
             <AuthForm onAuthSuccess={handleLogin} />

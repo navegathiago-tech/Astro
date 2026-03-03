@@ -32,8 +32,8 @@ export default function Dashboard({ user, onLogout }: { user: { email: string },
             <Sparkles className="w-6 h-6 text-amber-500" />
           </div>
           <div>
-            <h2 className="text-2xl font-display text-amber-100">AstroSoul</h2>
-            <p className="text-xs text-stone-500 uppercase tracking-widest">{user.email}</p>
+            <h2 className="text-xl font-display text-amber-100">Ramon Velasquez</h2>
+            <p className="text-[10px] text-amber-500/60 uppercase tracking-widest font-bold">O Retrato da sua alma gêmea</p>
           </div>
         </div>
         <button 
@@ -57,8 +57,8 @@ export default function Dashboard({ user, onLogout }: { user: { email: string },
                 className="max-w-xl mx-auto w-full"
               >
                 <div className="text-center mb-12 space-y-4">
-                  <h3 className="text-4xl font-display text-amber-200">Seu Portal Celestial</h3>
-                  <p className="text-stone-400">Insira seus dados de nascimento para abrir os portais do destino.</p>
+                  <h3 className="text-4xl font-display text-amber-200">O Retrato da sua alma gêmea</h3>
+                  <p className="text-stone-400">Ramon Velasquez revela o que as estrelas desenharam para você.</p>
                 </div>
                 <BirthDataForm onSubmit={handleFormSubmit} initialData={userData} />
               </motion.div>
