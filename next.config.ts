@@ -1,7 +1,8 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  reactStrictMode: false, // Disable strict mode to see if it helps with the fetch error
+  reactStrictMode: false,
+  devIndicators: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -19,7 +20,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: 'standalone',
+  // output: 'standalone',
   webpack: (config, { dev }) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.
     // Do not modifyâfile watching is disabled to prevent flickering during agent edits.

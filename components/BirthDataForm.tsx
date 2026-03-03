@@ -9,6 +9,7 @@ interface UserData {
   birthDate: string;
   birthTime: string;
   gender: string;
+  soulmateGender: string;
   birthPlace: string;
 }
 
@@ -24,6 +25,7 @@ export default function BirthDataForm({
     birthDate: '',
     birthTime: '',
     gender: 'feminino',
+    soulmateGender: 'masculino',
     birthPlace: ''
   });
 
@@ -93,7 +95,7 @@ export default function BirthDataForm({
 
         <div className="space-y-2">
           <label className="text-xs uppercase tracking-widest text-stone-500 font-semibold ml-1">
-            Gênero
+            Seu Gênero
           </label>
           <div className="grid grid-cols-2 gap-4">
             <button
@@ -113,6 +115,38 @@ export default function BirthDataForm({
               onClick={() => setFormData({ ...formData, gender: 'masculino' })}
               className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
                 formData.gender === 'masculino' 
+                  ? 'bg-blue-500/20 border-blue-500 text-blue-200' 
+                  : 'bg-black/40 border-white/10 text-stone-500 hover:border-white/20'
+              }`}
+            >
+              <Mars className="w-5 h-5" />
+              Masculino
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs uppercase tracking-widest text-stone-500 font-semibold ml-1">
+            Gênero da Alma Gêmea Desejada
+          </label>
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, soulmateGender: 'feminino' })}
+              className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                formData.soulmateGender === 'feminino' 
+                  ? 'bg-pink-500/20 border-pink-500 text-pink-200' 
+                  : 'bg-black/40 border-white/10 text-stone-500 hover:border-white/20'
+              }`}
+            >
+              <Venus className="w-5 h-5" />
+              Feminino
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, soulmateGender: 'masculino' })}
+              className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                formData.soulmateGender === 'masculino' 
                   ? 'bg-blue-500/20 border-blue-500 text-blue-200' 
                   : 'bg-black/40 border-white/10 text-stone-500 hover:border-white/20'
               }`}

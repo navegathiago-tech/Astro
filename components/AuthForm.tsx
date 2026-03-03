@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, Lock, Loader2, LogIn, UserPlus } from 'lucide-react';
+import { Mail, Lock, Loader2, LogIn } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function AuthForm({ onAuthSuccess }: { onAuthSuccess: (email: string) => void }) {
   const [email, setEmail] = useState('');
@@ -15,16 +16,15 @@ export default function AuthForm({ onAuthSuccess }: { onAuthSuccess: (email: str
     setLoading(true);
     setError('');
 
-    // Simulate API call
+    // Simulate a small delay for better UX
     setTimeout(() => {
-      if (password.length < 6) {
-        setError('A senha deve ter pelo menos 6 caracteres.');
-        setLoading(false);
-      } else {
+      if (password === 'RamonVelasquez123') {
         onAuthSuccess(email);
-        setLoading(false);
+      } else {
+        setError('Senha incorreta. Acesso negado.');
       }
-    }, 1500);
+      setLoading(false);
+    }, 800);
   };
 
   return (
